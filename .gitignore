@@ -17,3 +17,6 @@ fail_capture.py
 stv_test.py
 click_test.py
 winfp_test.py
+install_mihomo.py
+update_mihomo.py
+res_sweep.py

@@ -192,7 +192,7 @@ class BrowserSession:
 
     async def start(self) -> None:
         from camoufox.async_api import AsyncCamoufox
-        kwargs: dict[str, Any] = {"headless": True, "humanize": True,
+        kwargs: dict[str, Any] = {"headless": "virtual", "humanize": True,
                                   "i_know_what_im_doing": True}
         exe = _camoufox_exe()
         if exe:

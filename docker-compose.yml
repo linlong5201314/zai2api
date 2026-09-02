@@ -1,0 +1,23 @@
+services:
+  zai2api:
+    build: .
+    image: zai2api:latest
+    container_name: zai2api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      # camoufox binary is platform-specific; on Linux the image fetches its
+      # own at build time. On Windows/macOS run natively instead.
+    shm_size: "256m"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

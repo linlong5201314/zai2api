@@ -1,0 +1,7 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+httpx>=0.27.0
+aiosqlite>=0.20.0
+pydantic>=2.7.0
+# browser session: required for the Aliyun traceless captcha (chat.z.ai v2 API)
+camoufox[geoip]>=0.4.11

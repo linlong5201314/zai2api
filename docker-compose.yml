@@ -4,22 +4,21 @@ services:
     image: zai2api:latest
     container_name: zai2api
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # host network: the browser session dials the mihomo proxy on
+    # 127.0.0.1:7890 which lives on the host
+    network_mode: host
     env_file:
       - .env
-    security_opt:
-      - seccomp:unconfined   # Firefox sandbox needs user namespaces in container
-    cap_add:
-      - SYS_ADMIN
     environment:
       - DATA_DIR=/app/data
       - MOZ_DISABLE_CONTENT_SANDBOX=1
     volumes:
       - ./data:/app/data
-      # camoufox binary is platform-specific; on Linux the image fetches its
-      # own at build time. On Windows/macOS run natively instead.
     shm_size: "256m"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_ADMIN
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]

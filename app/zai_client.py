@@ -196,7 +196,8 @@ class BrowserSession:
         if exe:
             kwargs["executable_path"] = exe
         if config.CAMOUFOX_PROXY:
-            kwargs["proxy"] = config.CAMOUFOX_PROXY
+            # camoufox expects a dict: {"server": "http://host:port", ...}
+            kwargs["proxy"] = {"server": config.CAMOUFOX_PROXY}
         if config.CAMOUFOX_OS:
             kwargs["os"] = config.CAMOUFOX_OS
         self._browser = await AsyncCamoufox(**kwargs).__aenter__()

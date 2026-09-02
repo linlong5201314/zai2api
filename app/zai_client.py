@@ -195,6 +195,10 @@ class BrowserSession:
         exe = _camoufox_exe()
         if exe:
             kwargs["executable_path"] = exe
+        if config.CAMOUFOX_PROXY:
+            kwargs["proxy"] = config.CAMOUFOX_PROXY
+        if config.CAMOUFOX_OS:
+            kwargs["os"] = config.CAMOUFOX_OS
         self._browser = await AsyncCamoufox(**kwargs).__aenter__()
         self._page = await self._browser.new_page()
         await self._page.goto(ZAI_HOME, wait_until="domcontentloaded",

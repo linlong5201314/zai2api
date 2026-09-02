@@ -52,6 +52,12 @@ UPSTREAM_PROXY = os.environ.get("UPSTREAM_PROXY") or os.environ.get("ALL_PROXY")
 
 # Aliyun traceless captcha solving via camoufox (required by chat.z.ai v2 API).
 CAPTCHA_ENABLED = os.environ.get("CAPTCHA_ENABLED", "true").lower() in ("1", "true", "yes")
+# Proxy for the camoufox browser session only. Datacenter IPs are commonly
+# rejected by the Aliyun risk engine (captcha never returns); a residential
+# or clean proxy usually fixes it. Example: http://user:pass@host:port
+CAMOUFOX_PROXY = os.environ.get("CAMOUFOX_PROXY") or None
+# Force browser fingerprint OS: windows | macos | linux (default: host OS)
+CAMOUFOX_OS = os.environ.get("CAMOUFOX_OS") or None
 
 # Max bytes for remote image downloads fed into vision messages
 MAX_IMAGE_SIZE = int(os.environ.get("MAX_IMAGE_SIZE", str(10 * 1024 * 1024)))

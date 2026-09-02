@@ -198,6 +198,8 @@ class BrowserSession:
         if config.CAMOUFOX_PROXY:
             # camoufox expects a dict: {"server": "http://host:port", ...}
             kwargs["proxy"] = {"server": config.CAMOUFOX_PROXY}
+            # align geo fingerprint (tz/locale) with the proxy exit IP
+            kwargs["geoip"] = config.CAMOUFOX_GEOIP
         if config.CAMOUFOX_OS:
             kwargs["os"] = config.CAMOUFOX_OS
         self._browser = await AsyncCamoufox(**kwargs).__aenter__()

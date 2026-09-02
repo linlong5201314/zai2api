@@ -58,6 +58,10 @@ CAPTCHA_ENABLED = os.environ.get("CAPTCHA_ENABLED", "true").lower() in ("1", "tr
 CAMOUFOX_PROXY = os.environ.get("CAMOUFOX_PROXY") or None
 # Force browser fingerprint OS: windows | macos | linux (default: host OS)
 CAMOUFOX_OS = os.environ.get("CAMOUFOX_OS") or None
+# Match timezone/locale/geo fingerprint to the proxy exit IP. Required when
+# CAMOUFOX_PROXY is set, otherwise fingerprint geo (host location) conflicts
+# with the proxy egress and risk engines flag the session.
+CAMOUFOX_GEOIP = os.environ.get("CAMOUFOX_GEOIP", "true").lower() in ("1", "true", "yes")
 
 # Max bytes for remote image downloads fed into vision messages
 MAX_IMAGE_SIZE = int(os.environ.get("MAX_IMAGE_SIZE", str(10 * 1024 * 1024)))

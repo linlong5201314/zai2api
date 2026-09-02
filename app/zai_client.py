@@ -48,7 +48,9 @@ SALT_KEY = "key-@@@@)))()((9))-xxxx&&&%%%%%"
 
 CAPTCHA_SCENE_ID = "didk33e0"
 CAPTCHA_PREFIX = "no8xfe"
-CAPTCHA_REGION = "cn"
+# verified from prod-fe-1.1.92 bundle: Nh={REGION:"sgp",PREFIX:"no8xfe"}
+# (region "cn" returns IllegalScene for this SceneId)
+CAPTCHA_REGION = "sgp"
 CAPTCHA_SDK_URL = "https://o.alicdn.com/captcha-frontend/aliyunCaptcha/AliyunCaptcha.js"
 ZAI_HOME = "https://chat.z.ai/"
 

@@ -10,3 +10,10 @@ data/
 .pytest_cache/
 .DS_Store
 .pw-profile/
+deploy_exec.py
+probe*.py
+region_test.py
+fail_capture.py
+stv_test.py
+click_test.py
+winfp_test.py

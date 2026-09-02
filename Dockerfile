@@ -4,7 +4,11 @@ WORKDIR /app
 
 # camoufox runtime deps (Firefox)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgtk-3-0 libdbus-glib-1-2 libxt6 libasound2 \
+    libgtk-3-0 libdbus-glib-1-2 libxt6 libasound2 libx11-xcb1 \
+    libxcomposite1 libxdamage1 libxext6 libxfixes3 libxrandr2 \
+    libgbm1 libxkbcommon0 libnss3 libnspr4 libcups2 \
+    libpango-1.0-0 libcairo2 libatk1.0-0 libatk-bridge2.0-0 \
+    libdrm2 libxcb-shm0 libxcb1 fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

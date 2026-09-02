@@ -4,7 +4,7 @@ WORKDIR /app
 
 # camoufox runtime deps (Firefox)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gtk3 libdbus-glib-1-2 libxt6 libasound2 \
+    libgtk-3-0 libdbus-glib-1-2 libxt6 libasound2 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

@@ -117,10 +117,14 @@ async def run_chat(req: ChatRequest, key_hint: str) -> AsyncIterator[tuple[str, 
             yield "done", info
             return
         except UpstreamAuthError as e:
+            log.warning("upstream auth rejected (%s/%s): %s",
+                        cred["kind"], cred["token"][:12], e)
             await pool.report_auth_fail(cred["token"], cred["kind"])
             last_error = e
             info["http_status"] = 401
         except UpstreamWafError as e:
+            log.warning("upstream waf/limit (%s/%s): %s",
+                        cred["kind"], cred["token"][:12], e)
             await pool.report_server_error(cred["token"])
             last_error = e
             info["http_status"] = 405
@@ -129,11 +133,15 @@ async def run_chat(req: ChatRequest, key_hint: str) -> AsyncIterator[tuple[str, 
                 info["error"] = str(e)
                 yield "error", e
                 return
+            log.warning("upstream request failed (%s/%s): %s",
+                        cred["kind"], cred["token"][:12], e)
             await pool.report_server_error(cred["token"])
             last_error = e
         # retry with next credential (only reached when nothing was emitted)
 
     info["error"] = str(last_error)
+    log.error("chat failed after %d attempts: %s",
+              max(1, config.RETRY_COUNT), last_error)
     yield "error", last_error or RuntimeError("all credentials exhausted")
 
 

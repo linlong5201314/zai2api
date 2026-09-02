@@ -54,12 +54,9 @@ ZAI_HOME = "https://chat.z.ai/"
 
 CAPTCHA_JS = """
     async () => {
-        function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
         try {
-            if(!window.initAliyunCaptcha){
-                window.AliyunCaptchaConfig={region:'__REGION__',prefix:'__PREFIX__'};
-                await loadScript('__SDK__');
-            }
+            if (typeof window.initAliyunCaptcha !== 'function')
+                return {err: 'sdk not injected'};
             window._capInst = null; window._nvcResult = null;
             const el = document.createElement('div'); el.id='cap-el';
             el.style.cssText='position:absolute;left:-99999px;top:-99999px;';
@@ -88,8 +85,17 @@ CAPTCHA_JS = """
             return {cap: window._nvcResult};
         } catch(e) { return {err: String(e)}; }
     }
-""".replace("__REGION__", CAPTCHA_REGION).replace("__PREFIX__", CAPTCHA_PREFIX) \
-   .replace("__SCENE__", CAPTCHA_SCENE_ID).replace("__SDK__", CAPTCHA_SDK_URL)
+""".replace("__SCENE__", CAPTCHA_SCENE_ID)
+
+SDK_SETUP_JS = """
+    (code) => {
+        try {
+            window.AliyunCaptchaConfig = {region: '__REGION__', prefix: '__PREFIX__'};
+            (0, eval)(code);
+        } catch (e) { return 'inject error: ' + String(e).slice(0, 120); }
+        return typeof window.initAliyunCaptcha;
+    }
+""".replace("__REGION__", CAPTCHA_REGION).replace("__PREFIX__", CAPTCHA_PREFIX)
 
 # Runs entirely inside the page: fresh guest token -> captcha -> signed fetch.
 # Streams raw SSE lines back through window.zai2apiSink which the Python side
@@ -174,6 +180,9 @@ class BrowserSession:
         self._browser = None
         self._page = None
         self._fe_version: Optional[str] = None
+        self._sdk_code: Optional[str] = None
+        self._sdk_http = httpx.AsyncClient(timeout=30, trust_env=False,
+                                           proxy=config.UPSTREAM_PROXY)
 
     @property
     def ready(self) -> bool:
@@ -226,6 +235,7 @@ class BrowserSession:
             prompt = payload.get("signature_prompt") or ""
             _, sig = gen_signature(prompt, user_id)
             fev = await self.fe_version()
+            await self._ensure_sdk_injected()
             cap_js = await self._page.evaluate(CAPTCHA_JS)
             if not (isinstance(cap_js, dict) and cap_js.get("cap")):
                 raise UpstreamWafError(f"captcha solve failed: {cap_js}")
@@ -239,6 +249,35 @@ class BrowserSession:
                     raise UpstreamAuthError(f"upstream {status}: {out['err']}")
                 raise RuntimeError(f"upstream {status}: {out['err']}")
             return out.get("text", "").split("\n")
+
+    async def _ensure_sdk_injected(self) -> None:
+        """Inject the Aliyun captcha SDK source directly into the page.
+
+        Loading it via <script src> is unreliable on some CDN edges (onload
+        fires but window.initAliyunCaptcha stays undefined), so we download
+        the source ourselves and eval() it in the page context.
+        """
+        if await self._page.evaluate("typeof window.initAliyunCaptcha") == "function":
+            return
+        code = await self._download_sdk()
+        got = await self._page.evaluate(SDK_SETUP_JS, code)
+        if got != "function":
+            raise UpstreamWafError(f"captcha SDK inject failed: {got}")
+
+    async def _download_sdk(self) -> str:
+        if self._sdk_code:
+            return self._sdk_code
+        r = await self._sdk_http.get(
+            CAPTCHA_SDK_URL, headers={"User-Agent": BROWSER_UA,
+                                      "Referer": ZAI_HOME})
+        r.raise_for_status()
+        text = r.text
+        if "initAliyunCaptcha" not in text:
+            raise UpstreamWafError(
+                f"captcha SDK source invalid ({len(text)} bytes)")
+        self._sdk_code = text
+        log.info("captcha SDK downloaded: %d bytes", len(text))
+        return text
 
 
 class ZaiClient:

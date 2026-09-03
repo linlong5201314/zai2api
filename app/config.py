@@ -62,6 +62,10 @@ CAMOUFOX_OS = os.environ.get("CAMOUFOX_OS") or None
 # CAMOUFOX_PROXY is set, otherwise fingerprint geo (host location) conflicts
 # with the proxy egress and risk engines flag the session.
 CAMOUFOX_GEOIP = os.environ.get("CAMOUFOX_GEOIP", "true").lower() in ("1", "true", "yes")
+# Persistent browser profile directory. When set, the session keeps cookies,
+# localStorage and device history across restarts — Aliyun's risk engine
+# treats a returning device much more leniently than a fresh one.
+CAMOUFOX_DATA_DIR = os.environ.get("CAMOUFOX_DATA_DIR") or None
 
 # Max bytes for remote image downloads fed into vision messages
 MAX_IMAGE_SIZE = int(os.environ.get("MAX_IMAGE_SIZE", str(10 * 1024 * 1024)))

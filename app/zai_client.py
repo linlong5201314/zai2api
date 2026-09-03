@@ -204,6 +204,11 @@ class BrowserSession:
             kwargs["geoip"] = config.CAMOUFOX_GEOIP
         if config.CAMOUFOX_OS:
             kwargs["os"] = config.CAMOUFOX_OS
+        if config.CAMOUFOX_DATA_DIR:
+            # persistent profile: cookies/localStorage/device history survive
+            # restarts, which materially improves the risk score
+            kwargs["persistent_context"] = True
+            kwargs["user_data_dir"] = config.CAMOUFOX_DATA_DIR
         self._browser = await AsyncCamoufox(**kwargs).__aenter__()
         self._page = await self._browser.new_page()
         await self._page.goto(ZAI_HOME, wait_until="domcontentloaded",

@@ -10,12 +10,12 @@ from app.zai_client import SDK_SETUP_JS, CAPTCHA_JS
 import httpx
 
 CANDIDATES = [
-    "202 🇯🇵|日本原生-IEPL 02",
-    "208 🇯🇵|日本原生-IEPL 01",
-    "475 🇯🇵|日本星链家宽-IEPL 02",
-    "951 🇯🇵|日本星链家宽-IEPL 01",
-    "211 🇻🇳|越南家宽-IEPL 01",
-    "67 🇭🇰|香港家宽-IEPL 01",
+    "🇯🇵|日本原生-IEPL 02",
+    "🇯🇵|日本原生-IEPL 01",
+    "🇯🇵|日本星链家宽-IEPL 02",
+    "🇯🇵|日本星链家宽-IEPL 01",
+    "🇻🇳|越南家宽-IEPL 01",
+    "🇭🇰|香港家宽-IEPL 01",
 ]
 
 
